@@ -69,7 +69,7 @@ chmod +x build.sh
 
 # Run the build script
 ./build.sh
-
+```
 
 ## 🖥️ Architecture Decisions
 ### 1. Technology Stack
@@ -101,6 +101,7 @@ cd backend
 npm install
 npm start
 ```
+
 #### 2️⃣ Start the Frontend
 ```sh
 cd frontend
@@ -180,20 +181,21 @@ To view the logs for your Grafana container, use the following `docker-compose` 
 
 ```bash
 docker-compose logs grafana
+```
 
 ## Grafana Monitoring Dashboards
 
 This project includes a comprehensive set of Grafana dashboards for monitoring different aspects of the application:
 
 ### 1. Service Health Dashboard
-Primary dashboard for overall system health monitoring:
+[Primary dashboard for overall system health monitoring](http://localhost:3002/d/service-health-v1/service-health-dashboard):
 - **Service Status**: UP/DOWN status for all services with color indicators
 - **Response Times**: Average response times for all services
 - **Error Rates**: Tracks system errors and failures
 - **Service Dependencies**: Monitors inter-service communication health
 
 ### 2. Frontend Performance Dashboard
-Focuses on client-side performance metrics:
+[Focuses on client-side performance metrics](http://localhost:3002/d/frontend-perf/frontend-performance-dashboard):
 - **Page Load Times**: Average and peak loading times for frontend pages
 - **Request Rate**: Number of page loads and API calls per second
 - **Memory Usage**: Frontend application memory consumption
@@ -201,7 +203,7 @@ Focuses on client-side performance metrics:
 - **Event Loop Performance**: Node.js event loop lag monitoring
 
 ### 3. Backend Performance Dashboard
-Monitors API and server performance:
+[Monitors API and server performance](http://localhost:3002/d/backend-perf/backend-performance-dashboard):
 - **API Response Times**: Detailed timing for backend endpoints
 - **Request Rates**: Tracks API calls per endpoint
 - **Error Count**: Number of backend errors
@@ -209,13 +211,13 @@ Monitors API and server performance:
 - **Total Requests**: Overall system load monitoring
 
 ### 4. Business Metrics Dashboard
-Tracks business-relevant performance indicators:
+[Tracks business-relevant performance indicators](http://localhost:3002/d/business-metrics-v5/business-metrics-dashboard):
 - **User Activity**: Real-time tracking of API requests and page views
 - **Response Times**: Both frontend and backend response times
 - **Total Requests**: Overall system usage patterns
 
 ### 5. Infrastructure Dashboard
-Monitors system-level metrics:
+[Monitors system-level metrics](http://localhost:3002/d/infrastructure-dash/infrastructure-dashboard):
 - **Container Health**: Status of all containerized services
 - **Resource Usage**: CPU and Memory utilization by service
 - **Node.js Metrics**: 
@@ -442,3 +444,37 @@ And added basic HTML structure to ensure the frontend rendered correctly.
 
 **Lesson Learned:**  
 Even with a well-defined stack, minor issues with dependency management and missing files can cause major headaches. Careful debugging, using logs, and force-cleaning npm caches helped resolve these issues effectively.
+ 
+## **OpenTelemetry (OTel) Tracing - Observability Discussion - NOT imlpimented**
+
+### **Why Tracing Matters in Modern Observability**
+In distributed systems, monitoring just logs and metrics is not enough. **Tracing** allows engineers to track requests as they move through multiple services, helping diagnose bottlenecks and understand dependencies.
+
+While this project primarily focuses on **metrics (Prometheus)** and **visualization (Grafana)**, tracing would be a valuable addition for **deep-dive debugging and root cause analysis**.
+
+---
+
+### **My Experience with OpenTelemetry**
+I have worked on **OpenTelemetry (OTel) tracing projects**, particularly for **Spring Boot developers**, enabling them to gain deeper insights into their microservices. These projects involved:
+- **Instrumenting Java-based microservices** with OpenTelemetry SDKs.
+- **Exporting traces to distributed tracing backends** such as **Jaeger** and **Grafana Tempo**.
+- **Correlating logs, metrics, and traces** to provide full observability.
+- **Optimizing tracing configurations** to balance performance and trace granularity.
+
+Through this experience, I have seen firsthand how **tracing bridges the gap between request flow visibility and debugging latency issues**.
+
+---
+
+### **How Tracing Could Be Integrated Here**
+Although tracing is **not implemented in this project**, a future enhancement could include:
+- **Adding OpenTelemetry SDKs** to **frontend and backend** for distributed tracing.
+- **Sending traces to a collector** (e.g., OpenTelemetry Collector, Jaeger).
+- **Correlating request logs with trace IDs** for better debugging.
+- **Visualizing traces in Grafana** alongside existing dashboards.
+
+This would provide **end-to-end observability** by showing **how requests flow through the system, where they slow down, and what dependencies contribute to performance bottlenecks**.
+
+---
+
+### **Conclusion**
+Observability is best achieved when **logs, metrics, and traces work together**. While this project focuses on **metrics and monitoring**, tracing is a natural next step for achieving a **full-stack observability solution**. My prior experience with OpenTelemetry in **Spring Boot microservices** has shown its effectiveness in improving system transparency, and a similar approach could be applied here in the future.
