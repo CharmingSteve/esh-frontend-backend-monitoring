@@ -16,16 +16,60 @@ git clone https://github.com/CharmingSteve/esh-frontend-backend-monitoring.git
 cd esh-frontend-backend-monitoring
 ```
 
-### Build and Start the Application
-```sh
+## 🛠 Build Script (build.sh)
+
+The `build.sh` script automates the build and deployment process with comprehensive error handling and logging.
+
+### Features
+
+#### 1. Logging System
+- Creates timestamped log files (`build_YYYYMMDD_HHMMSS.log`)
+- Logs all operations with timestamps
+- Maintains both console and file logging
+- Tracks warnings and errors
+
+#### 2. Error Handling
+- Implements sophisticated error trapping
+- Provides detailed error messages with line numbers
+- Performs cleanup on failure
+- Handles Docker and network-related errors
+
+#### 3. Health Checks
+Verifies the health of all services:
+- Backend (port 5000)
+- Frontend (port 3000)
+- Prometheus (port 9090)
+- Grafana (port 3002)
+
+#### 4. Build Process
+1. **Pre-flight Checks**
+   - Verifies Docker daemon is running
+   - Checks for required ports availability
+
+2. **Cleanup Phase**
+   - Stops existing containers
+   - Removes old containers
+   - Cleans up unused resources
+
+3. **Build Phase**
+   - Builds all services
+   - Starts containers in detached mode
+   - Verifies successful startup
+
+4. **Verification Phase**
+   - Checks container health
+   - Verifies port accessibility
+   - Validates service responses
+
+### Usage
+
+```bash
+# Make the script executable
+chmod +x build.sh
+
+# Run the build script
 ./build.sh
-```
-This script will:
-1. Build the frontend and backend Docker images.
-2. Start both services using `docker-compose up`.
-3. Expose the following endpoints:
-   - **Frontend:** [http://localhost:3000](http://localhost:3000)
-   - **Backend API:** [http://localhost:5000/api/message](http://localhost:5000/api/message)
+
 
 ## 🖥️ Architecture Decisions
 ### 1. Technology Stack
@@ -113,16 +157,29 @@ npm start
   ```sh
   docker-compose logs prometheus
   ```
+## Grafana Access and Configuration
 
-## Grafana
-- **Access Grafana**: [http://localhost:3002](http://localhost:3002)
-- **Default Login**:  
-  - Username: `steve`  
-  - Password: `gindi` 
-- **Check logs**:  
-  ```sh
-  docker-compose logs grafana
-  ```
+### Accessing the Grafana Instance
+
+Access your local Grafana instance via the following URL:
+
+- **Grafana URL:** [http://localhost:3002](http://localhost:3002)
+
+### Default Credentials (Local Test Environment)
+
+> :warning: **Important Security Note:** The credentials provided below are for this local test environment *only*.  The password is hardcoded in the `docker-compose` file for convenience.  **Do not use these credentials in a production environment.** In a production setup, store sensitive information like usernames and passwords in a `.env` file that is *excluded* from your version control system (e.g., add `.env` to your `.gitignore` file).
+
+| Credential | Value      |
+| :--------- | :--------- |
+| Username   | `steve`    |
+| Password   | `gindi`    |
+
+### Checking Grafana Logs
+
+To view the logs for your Grafana container, use the following `docker-compose` command:
+
+```bash
+docker-compose logs grafana
 
 ## Grafana Monitoring Dashboards
 
@@ -276,6 +333,50 @@ All dashboards include:
 4. **Development vs Production**:
    - Some variables might need different values in development
    - Consider using .env files for environment-specific settings
+## Security Considerations
+
+Ensuring security in this monitoring stack is crucial to protect sensitive metrics, prevent unauthorized access, and maintain system integrity. Below are the key security measures implemented and additional best practices for securing the installation.
+
+### **1. Restrict Grafana Access**
+- By default, Grafana is exposed on `localhost:3002`. Ensure it is not publicly accessible unless necessary.
+- Configure **user authentication** in Grafana using an **admin password** instead of default credentials.
+- **Restrict login attempts** to mitigate brute-force attacks.
+
+### **2. Protect Prometheus & API Endpoints**
+- Prometheus metrics are openly accessible on `/metrics`. Consider enabling **basic authentication** or **IP whitelisting** to restrict access.
+- **CORS policy** is configured to allow only trusted frontend services to communicate with the backend.
+- Backend API endpoints should validate and sanitize inputs to prevent **injection attacks**.
+
+### **3. Secure Docker & Nginx Configuration**
+- **Limit container privileges**: Ensure that containers do not run as `root`.
+- **Use read-only filesystems** for Grafana and Prometheus to prevent unauthorized modifications.
+- **Enable HTTPS** in Nginx to encrypt communication (requires a TLS certificate).
+- **Prevent open proxy issues** in Nginx by strictly defining `proxy_pass` rules.
+
+### **4. Protect Data Sources**
+- If Grafana connects to databases or external services, ensure credentials are stored securely using **environment variables** or Grafana’s **secure storage**.
+- Use **role-based access control (RBAC)** to limit data access based on user permissions.
+
+### **5. Logging & Monitoring**
+- **Monitor access logs** for suspicious activity.
+- **Enable audit logs** in Grafana to track configuration changes and unauthorized login attempts.
+- Set up alerts in Prometheus to detect **unexpected spikes in resource usage**, indicating potential abuse.
+
+### **6. Container & Image Security**
+- Regularly **update Docker images** to patch vulnerabilities.
+- **Use minimal base images** for all services to reduce the attack surface.
+- Scan Docker images with **security tools** like Trivy or Clair before deployment.
+
+### **7. Firewall & Network Security**
+- Configure a **firewall** to restrict external access to services.
+- **Disable unused ports** and services inside containers.
+- **Use network segmentation**: Run backend services in a private network, exposing only necessary endpoints.
+
+### **8. Backup & Recovery**
+- **Regularly back up** Grafana dashboards, Prometheus configurations, and backend API data.
+- Have a **disaster recovery plan** to restore services in case of an attack or failure.
+
+By implementing these security measures, you can significantly reduce the risk of unauthorized access, data leaks, and service disruptions in this monitoring stack.
 
 ## 🐞 Troubleshooting
 ### 1️⃣ Docker Build Fails
