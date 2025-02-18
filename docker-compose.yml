@@ -81,7 +81,7 @@ services:
       - GF_DATABASE_TYPE=sqlite3  # Ensure database is set
       - GF_PATHS_PROVISIONING=/usr/share/grafana/conf/provisioning # Ensure dashboards are provisioned
     volumes:
-      - grafana-storage:/var/lib/Grafana
+      - grafana-storage:/var/lib/grafana
       - ./monitoring/grafana/dashboards:/usr/share/grafana/dashboards  # ✅ Mount dashboards correctly
       - ./monitoring/grafana/provisioning/datasources:/usr/share/grafana/conf/provisioning/datasources
       - ./monitoring/grafana/provisioning/dashboards:/usr/share/grafana/conf/provisioning/dashboards   # ✅ Mount provisioning settings

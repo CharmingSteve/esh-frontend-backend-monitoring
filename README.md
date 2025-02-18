@@ -246,6 +246,21 @@ All dashboards include:
 - Container-level monitoring integration
 - Node.js-specific performance tracking
 
+## Alerts (Important Note)
+
+Alerting functionality has NOT been configured in this project. However, please be aware that **alert configurations cannot be directly included in automated assessments** without specific knowledge of the Grafana instance's data source UIDs.
+
+Alert rules in Grafana rely on a unique identifier (`datasourceUid`) for each data source (like Prometheus).  This `datasourceUid` is *specific to each Grafana instance* and will change when Grafana is deployed in a new environment (e.g., a different Docker container, a different machine).
+
+Therefore, to enable alerts in your own Grafana instance, you will need to:
+
+1. **Configure your Prometheus data source** within your Grafana instance.
+2. **Find the `datasourceUid`** of your Prometheus data source (Configuration -> Data sources -> your Prometheus data source).
+3. **Update the `alerting.yml` file** with the correct `datasourceUid`.
+4. **Restart Grafana.**
+
+Because these steps require manual configuration and access to the Grafana UI, they cannot be fully automated as part of an assessment. 
+
 ## General Logs & Debugging
 - **List all running containers**:  
   ```sh
