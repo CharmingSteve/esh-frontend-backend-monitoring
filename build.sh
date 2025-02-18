@@ -80,6 +80,7 @@ main() {
     check_container_health "backend" 6 || exit 1
     check_container_health "frontend" 6 || exit 1
     check_container_health "prometheus" 6 || exit 1
+    sleep 10
     check_container_health "grafana" 6 || exit 1
 
     # Verify ports are accessible
@@ -110,9 +111,14 @@ main() {
     log "- Prometheus: http://localhost:9090"
     log "- Grafana: http://localhost:3002"
     
-    # Check docker-compose logs for any warnings
-    log "Checking for warnings in container logs..."
-    docker-compose logs --tail=50 | grep -i "warn\|error" || true
+    # Silently log warnings and errors to file
+    docker-compose logs --tail=50 | grep -i "warn\|error" >> "$LOG_FILE" 2>&1
+
+    # Only show real errors (excluding known false positives)
+    if docker-compose logs --tail=50 | grep -i "error" | grep -v "user token not found" | grep -v "duplicate metrics" > /dev/null; then
+        log "⚠️  Critical errors found - check $LOG_FILE for details"
+    fi
+
 }
 
 # Run main function

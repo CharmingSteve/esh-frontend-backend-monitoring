@@ -76,6 +76,10 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=steve
       - GF_SECURITY_ADMIN_PASSWORD=gindi
+      - GF_DATABASE_WAL=true
+      - GF_PATHS_DATA=/var/lib/grafana
+      - GF_PATHS_LOGS=/var/log/grafana
+
       - GF_USERS_ALLOW_SIGN_UP=false  # Disable user signups
       - GF_LOG_LEVEL=debug  # Increase Grafana logging level
       - GF_DATABASE_TYPE=sqlite3  # Ensure database is set
