@@ -202,6 +202,81 @@ All dashboards include:
   docker-compose up --build -d
   ```
 
+## Environment Variables Documentation
+
+### Backend Service
+| Variable | Default | Description |
+|----------|---------|-------------|
+| BACKEND_PORT | 5000 | Port on which the backend server runs |
+| API_PATH | /api | Base path for all API endpoints |
+| NODE_ENV | production | Node.js environment setting |
+| PORT | 5000 | Alternative port setting (can be consolidated with BACKEND_PORT) |
+| LOG_LEVEL | debug | Controls logging verbosity (debug, info, warn, error) |
+| PROMETHEUS_METRICS_ENABLED | true | Enables/disables Prometheus metrics collection |
+
+### Frontend Service
+| Variable | Default | Description |
+|----------|---------|-------------|
+| REACT_APP_LOG_LEVEL | debug | Controls React application logging level |
+| REACT_APP_API_BASE_URL | http://backend:5000 | Backend API URL for frontend requests |
+| NODE_ENV | production | Ensures React runs in production mode with optimizations |
+
+### Frontend Monitor Service
+| Variable | Default | Description |
+|----------|---------|-------------|
+| NODE_PATH | /monitoring/node_modules | Path to Node.js modules for monitoring |
+| METRICS_PORT | 3001 | Port for exposing frontend metrics |
+| METRICS_PATH | /metrics | Endpoint path for Prometheus metrics |
+
+### Prometheus Service
+| Variable | Default | Description |
+|----------|---------|-------------|
+| PROMETHEUS_CONFIG | /etc/prometheus/prometheus.yml | Path to Prometheus configuration file |
+| PROMETHEUS_STORAGE_TSDB_RETENTION_TIME | 15d | Duration to retain metrics data |
+
+#### Optional Prometheus Variables (Currently Commented)
+| Variable | Default | Description |
+|----------|---------|-------------|
+| PROMETHEUS_WEB_ENABLE_ADMIN_API | true | Enables Prometheus admin API |
+| PROMETHEUS_WEB_BASIC_AUTH_USERNAME | admin | Username for basic auth |
+| PROMETHEUS_WEB_BASIC_AUTH_PASSWORD | secure | Password for basic auth |
+| PROMETHEUS_WEB_ENABLE_LIFECYCLE | true | Enables lifecycle endpoints |
+| PROMETHEUS_STORAGE_TSDB_RETENTION_SIZE | 5GB | Maximum size of stored metrics |
+| PROMETHEUS_WEB_EXTERNAL_URL | http://prometheus:9090 | External URL for Prometheus |
+| PROMETHEUS_WEB_ROUTE_PREFIX | / | URL prefix for all Prometheus routes |
+| PROMETHEUS_STORAGE_TSDB_WAL_COMPRESSION | true | Enables WAL compression |
+| PROMETHEUS_QUERY_MAX_SAMPLES | 50000000 | Maximum samples in a query |
+
+### Grafana Service
+| Variable | Default | Description |
+|----------|---------|-------------|
+| GF_SECURITY_ADMIN_USER | steve | Grafana admin username |
+| GF_SECURITY_ADMIN_PASSWORD | gindi | Grafana admin password |
+| GF_USERS_ALLOW_SIGN_UP | false | Controls user registration |
+| GF_LOG_LEVEL | debug | Grafana logging level |
+| GF_DATABASE_TYPE | sqlite3 | Database type for Grafana |
+| GF_PATHS_PROVISIONING | /usr/share/grafana/conf/provisioning | Path for provisioning configs |
+
+### Usage Notes
+
+1. **Security Variables**:
+   - Change default passwords in production
+   - Consider using Docker secrets for sensitive values
+   - Enable authentication for Prometheus in production
+
+2. **Logging Variables**:
+   - Reduce log levels in production (change 'debug' to 'info' or 'warn')
+   - Consider log rotation settings
+
+3. **Performance Variables**:
+   - Adjust retention settings based on available storage
+   - Monitor metrics storage growth
+   - Tune query limits based on usage
+
+4. **Development vs Production**:
+   - Some variables might need different values in development
+   - Consider using .env files for environment-specific settings
+
 ## 🐞 Troubleshooting
 ### 1️⃣ Docker Build Fails
 **Error:** `failed to compute cache key: failed to calculate checksum of ref...`  

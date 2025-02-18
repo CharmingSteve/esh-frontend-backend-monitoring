@@ -42,16 +42,34 @@ services:
     networks:
       - monitoring
 
-  prometheus:
-    environment:
-      - PROMETHEUS_CONFIG=/etc/prometheus/prometheus.yml
+  prometheus:      
     image: prom/prometheus
     volumes:
       - ./monitoring/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
     ports:
       - "9090:9090"
     networks:
       - monitoring
+    environment:
+      - PROMETHEUS_CONFIG=/etc/prometheus/prometheus.yml
+      - PROMETHEUS_STORAGE_TSDB_RETENTION_TIME=15d  # Keep data for 15 days
+     #- PROMETHEUS_WEB_ENABLE_ADMIN_API=true        # Enable admin API
+     #- PROMETHEUS_WEB_BASIC_AUTH_USERNAME=admin    # Basic auth
+     #- PROMETHEUS_WEB_BASIC_AUTH_PASSWORD=secure   # Basic auth password
+   #- PROMETHEUS_WEB_ENABLE_ADMIN_API=true
+    #- PROMETHEUS_WEB_ENABLE_LIFECYCLE=true
+    #- PROMETHEUS_WEB_BASIC_AUTH_USERNAME=admin
+    #- PROMETHEUS_WEB_BASIC_AUTH_PASSWORD=secure_password
+    # Storage settings
+    #- PROMETHEUS_STORAGE_TSDB_RETENTION_TIME=15d
+    #- PROMETHEUS_STORAGE_TSDB_RETENTION_SIZE=5GB
+    # Web settings
+    #- PROMETHEUS_WEB_EXTERNAL_URL=http://prometheus:9090
+    #- PROMETHEUS_WEB_ROUTE_PREFIX=/
+    # Performance tuning
+    #- PROMETHEUS_STORAGE_TSDB_WAL_COMPRESSION=true
+    #- PROMETHEUS_QUERY_MAX_SAMPLES=50000000
 
   grafana:
     image: grafana/grafana
@@ -79,3 +97,4 @@ networks:
 
 volumes:
   grafana-storage:
+  prometheus-data:  
