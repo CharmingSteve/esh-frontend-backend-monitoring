@@ -1,0 +1,24 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    jsonData:
+      timeInterval: "5s"
+
+  - name: Backend Metrics
+    type: prometheus
+    access: proxy
+    url: http://backend:5000/metrics
+    jsonData:
+      timeInterval: "5s"
+
+  - name: Frontend Metrics
+    type: prometheus
+    access: proxy
+    url: http://frontend-monitor:3003/metrics
+    jsonData:
+      timeInterval: "5s"

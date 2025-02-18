@@ -1,0 +1,81 @@
+services:
+  backend:
+    environment:
+      - BACKEND_PORT=5000
+      - API_PATH=/api
+      - NODE_ENV=production  # Run backend in production mode
+      - PORT=5000  # Backend server port
+      - LOG_LEVEL=debug  # Control backend logging verbosity
+      - PROMETHEUS_METRICS_ENABLED=true  # Enable Prometheus metrics (if needed)
+    build: ./backend
+    ports:
+      - "5000:5000"
+    networks:
+      - monitoring
+
+  frontend:
+    environment:
+      - REACT_APP_LOG_LEVEL=debug
+      - REACT_APP_API_BASE_URL=http://backend:5000  # Base API URL for frontend requests
+      - NODE_ENV=production  # Ensures React runs in production mode
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - monitoring
+    volumes:
+      - ./frontend/conf.d:/etc/nginx/conf.d
+
+  frontend-monitor:
+    build: ./frontend
+    command: ["sh", "-c", "export NODE_PATH=/monitoring/node_modules && node /server.js"]
+    environment:
+      - NODE_PATH=/monitoring/node_modules
+      - METRICS_PORT=3001
+      - METRICS_PATH=/metrics
+    ports:
+      - "3003:3001"
+    depends_on:
+      - frontend
+    networks:
+      - monitoring
+
+  prometheus:
+    environment:
+      - PROMETHEUS_CONFIG=/etc/prometheus/prometheus.yml
+    image: prom/prometheus
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=steve
+      - GF_SECURITY_ADMIN_PASSWORD=gindi
+      - GF_USERS_ALLOW_SIGN_UP=false  # Disable user signups
+      - GF_LOG_LEVEL=debug  # Increase Grafana logging level
+      - GF_DATABASE_TYPE=sqlite3  # Ensure database is set
+      - GF_PATHS_PROVISIONING=/usr/share/grafana/conf/provisioning # Ensure dashboards are provisioned
+    volumes:
+      - grafana-storage:/var/lib/Grafana
+      - ./monitoring/grafana/dashboards:/usr/share/grafana/dashboards  # ✅ Mount dashboards correctly
+      - ./monitoring/grafana/provisioning/datasources:/usr/share/grafana/conf/provisioning/datasources
+      - ./monitoring/grafana/provisioning/dashboards:/usr/share/grafana/conf/provisioning/dashboards   # ✅ Mount provisioning settings
+    ports:
+      - "3002:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+
+volumes:
+  grafana-storage:
